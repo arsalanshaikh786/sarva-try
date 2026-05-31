@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Online Services Store – Akole</title>
+
+<!-- ─── PWA Meta Tags ─── -->
+<meta name="description" content="Fast, trusted, professional home and local services in Akole, Maharashtra. Food delivery, plumbers, electricians, taxi, cleaning and more.">
+<meta name="theme-color" content="#4f46e5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sarva-Nest">
+<meta name="application-name" content="Sarva-Nest">
+<meta name="msapplication-TileColor" content="#4f46e5">
+<meta name="msapplication-TileImage" content="icons/icon-144.png">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Sarva-Nest – Online Services Store">
+<meta property="og:description" content="Fast, trusted, professional home services in Akole, Maharashtra.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="icons/icon-512.png">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-128.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-72.png">
+
+<!-- Web App Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#4f46e5;--primary-dark:#3730a3;--accent:#7c3aed;
+  --bg:#f0f2ff;--card:#fff;--text:#1e1b4b;--muted:#6b7280;
+  --success:#16a34a;--error:#dc2626;--warn:#d97706;
+  --radius:20px;--tap:48px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;padding-bottom:72px;}
+
+/* ─ TOAST ─ */
+#toast{
+  position:fixed;top:16px;left:50%;
+  transform:translateX(-50%) translateY(-120px);
+  background:#1e1b4b;color:#fff;
+  padding:12px 22px;border-radius:50px;
+  font-size:14px;font-weight:700;
+  box-shadow:0 8px 28px rgba(0,0,0,.25);
+  z-index:9999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;max-width:90vw;text-align:center;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{background:#166534;}
+#toast.error{background:#991b1b;}
+#toast.warn{background:#92400e;}
+
+/* ─ LOADING SPINNER ─ */
+.btn-spinner{display:none;width:18px;height:18px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-left:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading .btn-spinner{display:inline-block;}
+.loading .btn-text{opacity:.7;}
+
+/* ─ OFFLINE BANNER ─ */
+#offlineBanner{
+  position:fixed;top:0;left:0;right:0;
+  background:#991b1b;color:#fff;
+  text-align:center;font-size:13px;font-weight:700;
+  padding:10px 16px;z-index:10000;
+  transform:translateY(-100%);transition:transform .4s;
+}
+#offlineBanner.show{transform:translateY(0);}
+
+/* ─ PWA INSTALL BANNER ─ */
+#installBanner{
+  position:fixed;bottom:76px;left:12px;right:12px;
+  background:#fff;border-radius:18px;
+  box-shadow:0 8px 32px rgba(79,70,229,.22);
+  padding:16px 18px;display:none;
+  align-items:center;gap:12px;z-index:997;
+  border:1.5px solid rgba(79,70,229,.12);
+  animation:slideUp .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+#installBanner.show{display:flex;}
+.install-icon{font-size:32px;flex-shrink:0;}
+.install-text{flex:1;}
+.install-text h4{font-size:14px;font-weight:800;color:var(--text);}
+.install-text p{font-size:11px;color:var(--muted);margin-top:2px;}
+.install-btns{display:flex;gap:8px;flex-shrink:0;}
+.install-btn{
+  padding:9px 14px;border-radius:30px;border:none;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;
+  cursor:pointer;min-height:36px;
+}
+.install-btn.primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
+.install-btn.dismiss{background:#f3f4f6;color:var(--muted);}
+
+/* ─ LOCATION PILL ─ */
+.top-location{
+  position:fixed;top:12px;right:12px;
+  background:var(--primary);color:#fff;
+  padding:8px 14px;border-radius:30px;
+  font-size:12px;font-weight:700;
+  z-index:1001;box-shadow:0 4px 14px rgba(79,70,229,.4);
+}
+
+/* ─ HEADER ─ */
+header{
+  background:linear-gradient(145deg,var(--primary),var(--accent));
+  padding:72px 20px 48px;text-align:center;color:#fff;
+  position:relative;overflow:hidden;
+}
+header::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='10'/%3E%3C/g%3E%3C/svg%3E");
+}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(1.9rem,7vw,3rem);font-weight:800;position:relative;}
+header p{font-size:clamp(.85rem,3vw,1rem);opacity:.85;margin-top:6px;position:relative;}
+.hero-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:22px;padding:14px 28px;
+  background:#fff;color:var(--primary);
+  border-radius:50px;text-decoration:none;
+  font-weight:800;font-size:15px;
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
+  position:relative;min-height:var(--tap);
+  transition:transform .15s;
+}
+.hero-btn:active{transform:scale(.96);}
+
+/* ─ SLIDER ─ */
+.slider{position:relative;width:100%;height:clamp(210px,55vw,370px);overflow:hidden;touch-action:pan-y;}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .8s;}
+.slide.active{opacity:1;}
+.slide img{width:100%;height:100%;object-fit:cover;}
+.slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.65) 0%,transparent 55%);}
+.caption{position:absolute;bottom:18px;left:18px;color:#fff;z-index:2;}
+.caption h2{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,5vw,2rem);font-weight:800;line-height:1.1;}
+.caption p{font-size:13px;opacity:.85;margin-top:3px;}
+.slider-dots{position:absolute;bottom:14px;right:16px;display:flex;gap:6px;z-index:10;}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);border:none;cursor:pointer;padding:0;transition:.3s;}
+.dot.active{background:#fff;transform:scale(1.3);}
+.prev,.next{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(255,255,255,.18);backdrop-filter:blur(6px);
+  border:none;color:#fff;font-size:20px;
+  width:40px;height:40px;border-radius:50%;
+  cursor:pointer;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+}
+.prev{left:10px;}.next{right:10px;}
+
+/* ─ SEARCH ─ */
+.search-wrap{padding:16px 16px 0;max-width:640px;margin:0 auto;}
+.search-box{position:relative;}
+.search-box input{
+  width:100%;padding:14px 44px 14px 46px;
+  border:none;border-radius:16px;
+  font-size:15px;font-family:'Nunito',sans-serif;
+  background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08);
+  outline:none;color:var(--text);min-height:var(--tap);
+}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;}
+#clearSearch{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;font-size:18px;cursor:pointer;
+  display:none;color:var(--muted);
+}
+
+/* ─ SECTION TITLE ─ */
+.section-title{padding:22px 16px 10px;display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;}
+.section-title h2{font-family:'Syne',sans-serif;font-size:clamp(1.2rem,5vw,1.55rem);font-weight:800;}
+.see-all{font-size:13px;color:var(--primary);font-weight:700;text-decoration:none;}
+
+/* ─ SERVICE CARDS ─ */
+.container{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:12px;padding:0 16px 4px;
+  max-width:1200px;margin:0 auto;
+}
+.card{
+  background:var(--card);border-radius:var(--radius);
+  padding:20px 14px;text-align:center;
+  box-shadow:0 6px 20px rgba(79,70,229,.08);
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .2s;
+}
+.card::before{
+  content:'';position:absolute;top:-28px;right:-28px;
+  width:75px;height:75px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--accent));opacity:.07;
+}
+.card:active{transform:scale(.97);}
+.card img{width:54px;height:54px;object-fit:contain;margin-bottom:10px;}
+.card h3{color:var(--text);font-size:14px;font-weight:800;margin-bottom:5px;line-height:1.2;}
+.card p{color:var(--muted);font-size:12px;margin-bottom:14px;line-height:1.4;}
+.card a{
+  display:inline-block;padding:9px 18px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;text-decoration:none;border-radius:30px;
+  font-weight:800;font-size:12px;min-height:36px;line-height:1.6;
+}
+.no-results{
+  grid-column:1/-1;text-align:center;
+  padding:32px;color:var(--muted);font-weight:700;
+  display:none;
+}
+
+/* ─ STATS STRIP ─ */
+.stats-strip{
+  display:flex;justify-content:space-around;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  margin:20px 16px;border-radius:var(--radius);
+  padding:18px 10px;max-width:calc(1200px - 32px);margin-left:auto;margin-right:auto;
+}
+.stat{text-align:center;color:#fff;}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;line-height:1;}
+.stat-lbl{font-size:11px;opacity:.8;margin-top:3px;font-weight:700;}
+
+/* ─ HOW IT WORKS ─ */
+.steps{
+  display:flex;flex-direction:column;gap:14px;
+  padding:0 16px 4px;max-width:600px;margin:0 auto;
+}
+.step{
+  display:flex;align-items:center;gap:14px;
+  background:#fff;border-radius:16px;
+  padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.06);
+}
+.step-num{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;font-weight:900;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.step-text h4{font-size:15px;font-weight:800;}
+.step-text p{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ─ AUTH ─ */
+.auth-container{padding:0 16px;display:flex;flex-direction:column;gap:14px;max-width:500px;margin:0 auto;}
+.auth-tabs{display:flex;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.06);}
+.auth-tab{flex:1;padding:14px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--muted);cursor:pointer;transition:.3s;}
+.auth-tab.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
+.auth-card{background:#fff;padding:24px 20px;border-radius:var(--radius);box-shadow:0 6px 24px rgba(0,0,0,.07);display:none;}
+.auth-card.visible{display:block;}
+.auth-card h2{font-family:'Syne',sans-serif;margin-bottom:18px;font-size:1.4rem;}
+
+.input-group{position:relative;margin-bottom:12px;}
+.field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;}
+.input-group input{
+  width:100%;padding:14px 42px 14px 44px;
+  border:2px solid #f0f0f0;border-radius:14px;
+  font-family:'Nunito',sans-serif;font-size:15px;
+  background:#fafafa;outline:none;color:var(--text);
+  transition:border-color .2s;min-height:var(--tap);
+}
+.input-group input:focus{border-color:var(--primary);background:#fff;}
+.input-group input.valid{border-color:#16a34a;}
+.input-group input.invalid{border-color:#dc2626;}
+.valid-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:16px;display:none;}
+.field-error{font-size:11px;color:var(--error);font-weight:700;margin-top:4px;margin-left:4px;display:none;}
+
+.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);}
+
+.pw-strength{height:4px;border-radius:4px;background:#eee;margin:-8px 0 10px;overflow:hidden;}
+.pw-strength-bar{height:100%;width:0;border-radius:4px;transition:width .3s,background .3s;}
+
+.auth-card button.submit-btn{
+  width:100%;padding:15px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;font-family:'Nunito',sans-serif;
+  font-weight:800;font-size:16px;cursor:pointer;
+  min-height:var(--tap);
+  box-shadow:0 6px 18px rgba(79,70,229,.35);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .2s;
+}
+.auth-card button.submit-btn:active{opacity:.9;}
+.auth-card button.submit-btn:disabled{opacity:.6;cursor:not-allowed;}
+
+.forgot-link{display:block;text-align:right;font-size:13px;color:var(--primary);font-weight:700;text-decoration:none;margin:-4px 0 14px;}
+
+/* ─ PROFILE ─ */
+.profile-card{margin:0 16px;background:#fff;padding:28px 22px;border-radius:var(--radius);box-shadow:0 6px 24px rgba(0,0,0,.07);display:none;max-width:500px;margin-left:auto;margin-right:auto;}
+.profile-header{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
+.avatar{
+  width:62px;height:62px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;color:#fff;font-weight:900;
+}
+.profile-header-text h2{font-family:'Syne',sans-serif;font-size:1.3rem;}
+.profile-header-text p{color:var(--muted);font-size:13px;}
+.profile-info{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #f3f4f6;font-size:14px;}
+.profile-info:last-of-type{border-bottom:none;}
+.info-icon{font-size:20px;flex-shrink:0;}
+.info-label{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.info-value{font-weight:700;margin-top:2px;}
+.logout-btn{margin-top:18px;width:100%;padding:14px;border:none;border-radius:14px;background:#fee2e2;color:#dc2626;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;min-height:var(--tap);}
+
+/* ─ CONTACT STRIP ─ */
+.contact-strip{
+  margin:20px 16px;border-radius:var(--radius);
+  background:#fff;padding:20px;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+  max-width:calc(1200px - 32px);margin-left:auto;margin-right:auto;
+}
+.contact-strip h3{font-family:'Syne',sans-serif;font-size:1.1rem;margin-bottom:14px;}
+.contact-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.contact-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:12px 18px;border-radius:50px;font-weight:800;
+  font-size:13px;text-decoration:none;min-height:44px;
+  transition:transform .15s;
+}
+.contact-btn:active{transform:scale(.95);}
+.contact-btn.whatsapp-btn{background:#25d366;color:#fff;}
+.contact-btn.call-btn{background:var(--primary);color:#fff;}
+.contact-btn.email-btn{background:#f3f4f6;color:var(--text);}
+
+/* ─ FOOTER ─ */
+footer{background:#1e1b4b;color:#fff;text-align:center;padding:36px 20px 20px;margin-top:24px;}
+footer h2{font-family:'Syne',sans-serif;font-size:1.3rem;margin-bottom:8px;}
+footer .footer-links{display:flex;justify-content:center;gap:16px;margin:12px 0;flex-wrap:wrap;}
+footer .footer-links a{color:rgba(255,255,255,.6);font-size:13px;font-weight:700;text-decoration:none;}
+footer p{font-size:12px;opacity:.45;margin-top:8px;}
+
+/* ─ WHATSAPP FAB ─ */
+.whatsapp-fab{
+  position:fixed;bottom:84px;right:16px;
+  width:52px;height:52px;background:#25d366;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px rgba(37,211,102,.45);
+  z-index:998;text-decoration:none;font-size:26px;
+  transition:transform .2s;
+}
+.whatsapp-fab:active{transform:scale(.9);}
+
+/* ─ BOTTOM NAV ─ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;
+  display:flex;justify-content:space-around;
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 20px rgba(0,0,0,.08);z-index:999;
+}
+.bottom-nav a{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  text-decoration:none;color:var(--muted);
+  font-size:10px;font-weight:700;padding:4px 8px;
+  border-radius:12px;min-width:var(--tap);transition:color .2s;
+}
+.bottom-nav a .icon{font-size:22px;line-height:1;}
+.bottom-nav a.active{color:var(--primary);}
+
+/* ─ DESKTOP ─ */
+@media(min-width:600px){.container{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:900px){
+  .container{grid-template-columns:repeat(4,1fr);}
+  .steps{flex-direction:row;max-width:1200px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Offline Banner -->
+<div id="offlineBanner">📡 You're offline – showing cached content</div>
+
+<!-- Location -->
+<div class="top-location">📍 Akole, Maharashtra</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- PWA Install Banner -->
+<div id="installBanner">
+  <div class="install-icon">📱</div>
+  <div class="install-text">
+    <h4>Install Sarva-Nest</h4>
+    <p>Add to home screen for faster access</p>
+  </div>
+  <div class="install-btns">
+    <button class="install-btn primary" id="installAccept">Install</button>
+    <button class="install-btn dismiss" id="installDismiss">✕</button>
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <h1>Sarva-Nest</h1>
+  <p>Fast · Trusted · Professional</p>
+</header>
+
+<!-- Slider -->
+<section class="slider" id="sliderEl">
+  <div class="slide active">
+    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=900&auto=format&fit=crop" loading="lazy" alt="Food Delivery">
+    <div class="caption"><h2>Food Delivery</h2><p>Fresh & Hot — Delivered Fast</p></div>
+  </div>
+  <div class="slide">
+    <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=900&auto=format&fit=crop" loading="lazy" alt="Home Services">
+    <div class="caption"><h2>Home Services</h2><p>Professionals At Your Doorstep</p></div>
+  </div>
+  <div class="slide">
+    <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=900&auto=format&fit=crop" loading="lazy" alt="Security">
+    <div class="caption"><h2>Security Services</h2><p>Trusted & Safe Guards</p></div>
+  </div>
+  <button class="prev" aria-label="Previous">&#8249;</button>
+  <button class="next" aria-label="Next">&#8250;</button>
+  <div class="slider-dots" id="sliderDots"></div>
+</section>
+
+<!-- Search -->
+<div class="search-wrap">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="search" id="searchInput" placeholder="Search services..." autocomplete="off">
+    <button id="clearSearch" aria-label="Clear">✕</button>
+  </div>
+</div>
+
+<!-- Services -->
+<div class="section-title" id="services">
+  <h2>Popular Services</h2>
+  <a href="#" class="see-all">See all</a>
+</div>
+
+<div class="container" id="serviceGrid">
+  <div class="card" data-name="food delivery">
+    <img src="https://img.icons8.com/color/96/food-delivery.png" alt="Food">
+    <h3>Food Delivery</h3><p>Fresh food delivered quickly.</p>
+    <a href="food.html">Order Now</a>
+  </div>
+  <div class="card" data-name="vegetable delivery">
+    <img src="https://img.icons8.com/color/96/food-delivery.png" alt="Vegetable">
+    <h3>Vegetable Delivery</h3><p>Fresh vegetables delivered quickly.</p>
+    <a href="veggie-delivery.html">Order Now</a>
+  </div>
+  <div class="card" data-name="plumber plumbing">
+    <img src="https://img.icons8.com/color/96/plumber.png" alt="Plumber">
+    <h3>Plumber</h3><p>Professional plumbing services.</p>
+    <a href="#">Book Now</a>
+  </div>
+  <div class="card" data-name="electrician electrical">
+    <img src="https://img.icons8.com/color/96/electrical.png" alt="Electrician">
+    <h3>Electrician</h3><p>Expert electrical repairs.</p>
+    <a href="#">Book Now</a>
+  </div>
+  <div class="card" data-name="taxi cab ride">
+    <img src="https://img.icons8.com/color/96/taxi.png" alt="Taxi">
+    <h3>Taxi Service</h3><p>Affordable taxi booking.</p>
+    <a href="#">Book Ride</a>
+  </div>
+  <div class="card" data-name="cleaning home">
+    <img src="https://img.icons8.com/color/96/broom.png" alt="Cleaning">
+    <h3>Home Cleaning</h3><p>Spotless clean homes.</p>
+    <a href="#">Book Now</a>
+  </div>
+  <div class="card" data-name="laundry washing clothes">
+    <img src="https://img.icons8.com/color/96/washing-machine.png" alt="Laundry">
+    <h3>Laundry</h3><p>Pick-up & delivery service.</p>
+    <a href="#">Book Now</a>
+  </div>
+  <div class="card" data-name="carpenter furniture wood">
+    <img src="https://img.icons8.com/color/96/carpenter.png" alt="Carpenter">
+    <h3>Carpenter</h3><p>Furniture & woodwork repairs.</p>
+    <a href="#">Book Now</a>
+  </div>
+  <div class="card" data-name="pest control insects">
+    <img src="https://img.icons8.com/color/96/pest.png" alt="Pest">
+    <h3>Pest Control</h3><p>Safe & effective pest removal.</p>
+    <a href="#">Book Now</a>
+  </div>
+  <div class="no-results" id="noResults">😕 No services found</div>
+</div>
+
+<!-- How it Works -->
+<div class="section-title" style="margin-top:8px;">
+  <h2>How It Works</h2>
+</div>
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-text"><h4>Choose a Service</h4><p>Browse and pick from our wide range of services.</p></div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-text"><h4>Book & Confirm</h4><p>Schedule at your preferred time. Instant confirmation.</p></div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-text"><h4>Expert Arrives</h4><p>Our verified professional comes to your doorstep.</p></div>
+  </div>
+</div>
+
+<!-- Auth Section -->
+<div class="section-title" id="account" style="margin-top:24px;">
+  <h2 id="authSectionTitle">My Account</h2>
+</div>
+
+<div class="auth-container" id="authContainer">
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchTab('register')">Register</button>
+    <button class="auth-tab" onclick="switchTab('login')">Login</button>
+  </div>
+
+  <!-- Register -->
+  <div class="auth-card visible" id="registerCard">
+    <h2>Create Account</h2>
+    <div class="input-group">
+      <span class="field-icon">👤</span>
+      <input type="text" id="reg_name" placeholder="Full Name" autocomplete="name">
+      <span class="valid-icon" id="vi_name"></span>
+      <div class="field-error" id="fe_name">Please enter your full name</div>
+    </div>
+    <div class="input-group">
+      <span class="field-icon">🎂</span>
+      <input type="number" id="reg_age" placeholder="Age" min="10" max="100" inputmode="numeric">
+      <span class="valid-icon" id="vi_age"></span>
+      <div class="field-error" id="fe_age">Enter a valid age (10–100)</div>
+    </div>
+    <div class="input-group">
+      <span class="field-icon">📱</span>
+      <input type="tel" id="reg_mobile" placeholder="Mobile Number" inputmode="tel" maxlength="10">
+      <span class="valid-icon" id="vi_mobile"></span>
+      <div class="field-error" id="fe_mobile">Enter a valid 10-digit mobile number</div>
+    </div>
+    <div class="input-group">
+      <span class="field-icon">💬</span>
+      <input type="tel" id="reg_whatsapp" placeholder="WhatsApp Number" inputmode="tel" maxlength="10">
+      <span class="valid-icon" id="vi_whatsapp"></span>
+      <div class="field-error" id="fe_whatsapp">Enter a valid 10-digit WhatsApp number</div>
+    </div>
+    <div class="input-group">
+      <span class="field-icon">🏠</span>
+      <input type="text" id="reg_address" placeholder="Address" autocomplete="street-address">
+      <span class="valid-icon" id="vi_address"></span>
+      <div class="field-error" id="fe_address">Please enter your address</div>
+    </div>
+    <div class="input-group">
+      <span class="field-icon">📧</span>
+      <input type="email" id="reg_email" placeholder="Email Address" autocomplete="email" inputmode="email">
+      <span class="valid-icon" id="vi_reg_email"></span>
+      <div class="field-error" id="fe_reg_email">Enter a valid email address</div>
+    </div>
+    <div class="input-group">
+      <span class="field-icon">🔒</span>
+      <input type="password" id="reg_password" placeholder="Password (min 6 chars)" autocomplete="new-password">
+      <button class="pass-toggle" type="button" onclick="togglePass('reg_password',this)">👁️</button>
+      <div class="field-error" id="fe_reg_pass">Password must be at least 6 characters</div>
+    </div>
+    <div class="pw-strength"><div class="pw-strength-bar" id="pwBar"></div></div>
+    <div class="input-group">
+      <span class="field-icon">🔒</span>
+      <input type="password" id="reg_confirm" placeholder="Confirm Password" autocomplete="new-password">
+      <button class="pass-toggle" type="button" onclick="togglePass('reg_confirm',this)">👁️</button>
+      <div class="field-error" id="fe_confirm">Passwords do not match</div>
+    </div>
+    <button class="submit-btn" id="regBtn" onclick="registerUser()">
+      <span class="btn-text">Create Account</span>
+      <span class="btn-spinner"></span>
+    </button>
+  </div>
+
+  <!-- Login -->
+  <div class="auth-card" id="loginCard">
+    <h2>Welcome Back 👋</h2>
+    <div class="input-group">
+      <span class="field-icon">📧</span>
+      <input type="email" id="log_email" placeholder="Email Address" autocomplete="email" inputmode="email">
+      <span class="valid-icon" id="vi_log_email"></span>
+      <div class="field-error" id="fe_log_email">Enter a valid email address</div>
+    </div>
+    <div class="input-group">
+      <span class="field-icon">🔒</span>
+      <input type="password" id="log_password" placeholder="Password" autocomplete="current-password">
+      <button class="pass-toggle" type="button" onclick="togglePass('log_password',this)">👁️</button>
+      <div class="field-error" id="fe_log_pass">Please enter your password</div>
+    </div>
+    <a href="#" class="forgot-link" onclick="forgotPassword(event)">Forgot Password?</a>
+    <button class="submit-btn" id="loginBtn" onclick="loginUser()">
+      <span class="btn-text">Login</span>
+      <span class="btn-spinner"></span>
+    </button>
+  </div>
+</div>
+
+<!-- Profile -->
+<div class="profile-card" id="profileCard">
+  <div class="profile-header">
+    <div class="avatar" id="avatarInitial">?</div>
+    <div class="profile-header-text">
+      <h2 id="profileName">–</h2>
+      <p id="profileEmail">–</p>
+    </div>
+  </div>
+  <div class="profile-info"><span class="info-icon">📱</span><div><div class="info-label">Mobile</div><div class="info-value" id="profileMobile">–</div></div></div>
+  <div class="profile-info"><span class="info-icon">💬</span><div><div class="info-label">WhatsApp</div><div class="info-value" id="profileWhatsapp">–</div></div></div>
+  <div class="profile-info"><span class="info-icon">🏠</span><div><div class="info-label">Address</div><div class="info-value" id="profileAddress">–</div></div></div>
+  <div class="profile-info"><span class="info-icon">🎂</span><div><div class="info-label">Age</div><div class="info-value" id="profileAge">–</div></div></div>
+  <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
+</div>
+
+<!-- Contact Strip -->
+<div class="contact-strip" id="contact">
+  <h3>📞 Get In Touch</h3>
+  <div class="contact-btns">
+    <a href="https://wa.me/919307320279" class="contact-btn whatsapp-btn">💬 WhatsApp</a>
+    <a href="tel:+919307320279" class="contact-btn call-btn">📞 Call Us</a>
+    <a href="mailto:info@onlineservicesstore.in" class="contact-btn email-btn">📧 Email</a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <h2>Online Services Store</h2>
+  <div class="footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">About Us</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <p>Developed by Arsalan Shaikh & Onkar Sadgir</p>
+  <p>© 2026 All Rights Reserved</p>
+</footer>
+
+<!-- WhatsApp FAB -->
+<a href="https://wa.me/919307320279" class="whatsapp-fab" aria-label="Chat on WhatsApp">💬</a>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="#" class="active" id="nav-home"><span class="icon">🏠</span>Home</a>
+  <a href="#services" id="nav-services"><span class="icon">⚡</span>Services</a>
+  <a href="#account" id="nav-account"><span class="icon">👤</span>Account</a>
+  <a href="#contact" id="nav-contact"><span class="icon">📞</span>Contact</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     FIREBASE MODULE
+══════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyBcXm5QQaYCCddVXNgGqTBAszdKEK-0PJQ",
+  authDomain:"multi-service-app-77dd8.firebaseapp.com",
+  projectId:"multi-service-app-77dd8",
+  storageBucket:"multi-service-app-77dd8.appspot.com",
+  messagingSenderId:"123732555482",
+  appId:"1:123732555482:web:ea47c825e0dbb504f597e3"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+function friendlyError(code){
+  const map = {
+    "auth/email-already-in-use"  :"This email is already registered. Try logging in.",
+    "auth/invalid-email"         :"Please enter a valid email address.",
+    "auth/weak-password"         :"Password is too weak. Use at least 6 characters.",
+    "auth/user-not-found"        :"No account found with this email.",
+    "auth/wrong-password"        :"Incorrect password. Please try again.",
+    "auth/invalid-credential"    :"Wrong email or password. Please check and try again.",
+    "auth/too-many-requests"     :"Too many attempts. Please wait a few minutes.",
+    "auth/network-request-failed":"Network error. Check your internet connection.",
+    "auth/user-disabled"         :"This account has been disabled. Contact support.",
+  };
+  return map[code] || "Something went wrong. Please try again.";
+}
+
+window.registerUser = async () => {
+  if(!window.validateRegister()) return;
+  const name=document.getElementById("reg_name").value.trim(),
+        age=document.getElementById("reg_age").value.trim(),
+        mobile=document.getElementById("reg_mobile").value.trim(),
+        whatsapp=document.getElementById("reg_whatsapp").value.trim(),
+        address=document.getElementById("reg_address").value.trim(),
+        email=document.getElementById("reg_email").value.trim(),
+        password=document.getElementById("reg_password").value;
+  const btn=document.getElementById("regBtn");
+  btn.disabled=true; btn.classList.add("loading");
+  try {
+    const uc=await createUserWithEmailAndPassword(auth,email,password);
+    await setDoc(doc(db,"users",uc.user.uid),{name,age,mobile,whatsapp,address,email,uid:uc.user.uid,createdAt:new Date().toISOString()});
+    showToast("✅ Account created! Welcome, "+name.split(" ")[0]+"!","success");
+  } catch(e){ showToast("❌ "+friendlyError(e.code),"error"); }
+  finally { btn.disabled=false; btn.classList.remove("loading"); }
+};
+
+window.loginUser = async () => {
+  if(!window.validateLogin()) return;
+  const email=document.getElementById("log_email").value.trim(),
+        password=document.getElementById("log_password").value;
+  const btn=document.getElementById("loginBtn");
+  btn.disabled=true; btn.classList.add("loading");
+  try {
+    await signInWithEmailAndPassword(auth,email,password);
+    showToast("✅ Login successful!","success");
+  } catch(e){ showToast("❌ "+friendlyError(e.code),"error"); }
+  finally { btn.disabled=false; btn.classList.remove("loading"); }
+};
+
+window.forgotPassword = async (e) => {
+  e.preventDefault();
+  const email=document.getElementById("log_email").value.trim();
+  if(!email){showToast("⚠️ Enter your email first","warn");return;}
+  try {
+    await sendPasswordResetEmail(auth,email);
+    showToast("📧 Reset email sent! Check your inbox.","success");
+  } catch(e){ showToast("❌ "+friendlyError(e.code),"error"); }
+};
+
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    document.getElementById("authContainer").style.display="none";
+    document.getElementById("profileCard").style.display="block";
+    document.getElementById("authSectionTitle").textContent="My Profile";
+    document.getElementById("nav-account").querySelector(".icon").textContent="✅";
+    const snap=await getDoc(doc(db,"users",user.uid));
+    if(snap.exists()){
+      const d=snap.data();
+      document.getElementById("profileName").innerText=d.name||"–";
+      document.getElementById("profileEmail").innerText=d.email||"–";
+      document.getElementById("profileMobile").innerText=d.mobile||"–";
+      document.getElementById("profileWhatsapp").innerText=d.whatsapp||"–";
+      document.getElementById("profileAddress").innerText=d.address||"–";
+      document.getElementById("profileAge").innerText=d.age||"–";
+      document.getElementById("avatarInitial").innerText=(d.name||"?")[0].toUpperCase();
+    }
+  } else {
+    document.getElementById("authContainer").style.display="flex";
+    document.getElementById("profileCard").style.display="none";
+    document.getElementById("authSectionTitle").textContent="My Account";
+    document.getElementById("nav-account").querySelector(".icon").textContent="👤";
+  }
+});
+
+window.logoutUser = async () => {
+  await signOut(auth);
+  showToast("👋 Logged out successfully.","success");
+};
+</script>
+
+<!-- ══════════════════════════════════════════════════
+     NON-MODULE JS
+══════════════════════════════════════════════════ -->
+<script>
+/* ── TOAST ── */
+function showToast(msg,type=""){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.className="toast show "+type;
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove("show"),3200);
+}
+window.showToast=showToast;
+
+/* ── PASSWORD TOGGLE ── */
+window.togglePass=function(id,btn){
+  const el=document.getElementById(id);
+  if(el.type==="password"){el.type="text";btn.textContent="🙈";}
+  else{el.type="password";btn.textContent="👁️";}
+};
+
+/* ── PASSWORD STRENGTH ── */
+document.getElementById("reg_password").addEventListener("input",function(){
+  const val=this.value, bar=document.getElementById("pwBar");
+  let s=0;
+  if(val.length>=6)s++;if(val.length>=10)s++;
+  if(/[A-Z]/.test(val))s++;if(/[0-9]/.test(val))s++;
+  if(/[^a-zA-Z0-9]/.test(val))s++;
+  const pct=(s/5)*100;
+  const color=s<=1?"#dc2626":s<=2?"#d97706":s<=3?"#16a34a":"#059669";
+  bar.style.width=pct+"%"; bar.style.background=color;
+});
+
+/* ── VALIDATION HELPERS ── */
+function setValid(id,viId,feId,ok){
+  const el=document.getElementById(id),vi=viId?document.getElementById(viId):null,fe=feId?document.getElementById(feId):null;
+  if(!el)return;
+  el.classList.toggle("valid",ok); el.classList.toggle("invalid",!ok);
+  if(vi){vi.textContent=ok?"✅":"";vi.style.display=ok?"block":"none";}
+  if(fe)fe.style.display=ok?"none":"block";
+}
+function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+function isPhone(v){return /^[6-9]\d{9}$/.test(v);}
+
+["reg_name","reg_age","reg_mobile","reg_whatsapp","reg_address","reg_email","reg_password","reg_confirm"].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.addEventListener("blur",()=>validateField(id));
+  el.addEventListener("input",()=>el.classList.remove("valid","invalid"));
+});
+
+function validateField(id){
+  const el=document.getElementById(id), val=el?el.value.trim():"";
+  switch(id){
+    case "reg_name":    setValid("reg_name","vi_name","fe_name",val.length>=2);break;
+    case "reg_age":     setValid("reg_age","vi_age","fe_age",val>=10&&val<=100);break;
+    case "reg_mobile":  setValid("reg_mobile","vi_mobile","fe_mobile",isPhone(val));break;
+    case "reg_whatsapp":setValid("reg_whatsapp","vi_whatsapp","fe_whatsapp",isPhone(val));break;
+    case "reg_address": setValid("reg_address","vi_address","fe_address",val.length>=5);break;
+    case "reg_email":   setValid("reg_email","vi_reg_email","fe_reg_email",isEmail(val));break;
+    case "reg_password":setValid("reg_password",null,"fe_reg_pass",el.value.length>=6);break;
+    case "reg_confirm":{
+      const pw=document.getElementById("reg_password").value;
+      setValid("reg_confirm",null,"fe_confirm",el.value===pw&&el.value.length>=6);break;
+    }
+  }
+}
+
+window.validateRegister=function(){
+  const f=["reg_name","reg_age","reg_mobile","reg_whatsapp","reg_address","reg_email","reg_password","reg_confirm"];
+  f.forEach(validateField);
+  const ok=f.every(id=>{const el=document.getElementById(id);return el&&el.classList.contains("valid");});
+  if(!ok)showToast("⚠️ Please fix the errors above","warn");
+  return ok;
+};
+
+window.validateLogin=function(){
+  const email=document.getElementById("log_email").value.trim();
+  const pass=document.getElementById("log_password").value;
+  let ok=true;
+  if(!isEmail(email)){document.getElementById("fe_log_email").style.display="block";document.getElementById("log_email").classList.add("invalid");ok=false;}
+  else{document.getElementById("fe_log_email").style.display="none";document.getElementById("log_email").classList.remove("invalid");}
+  if(pass.length<1){document.getElementById("fe_log_pass").style.display="block";document.getElementById("log_password").classList.add("invalid");ok=false;}
+  else{document.getElementById("fe_log_pass").style.display="none";document.getElementById("log_password").classList.remove("invalid");}
+  if(!ok)showToast("⚠️ Please fill in all fields","warn");
+  return ok;
+};
+
+["log_email","log_password"].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener("input",()=>el.classList.remove("invalid"));
+});
+
+/* ── AUTH TABS ── */
+window.switchTab=function(tab){
+  document.getElementById("registerCard").classList.toggle("visible",tab==="register");
+  document.getElementById("loginCard").classList.toggle("visible",tab==="login");
+  document.querySelectorAll(".auth-tab").forEach((b,i)=>{
+    b.classList.toggle("active",(tab==="register"&&i===0)||(tab==="login"&&i===1));
+  });
+};
+
+/* ── SLIDER ── */
+const slides=document.querySelectorAll(".slide"),dotsWrap=document.getElementById("sliderDots");
+let idx=0,slTimer;
+slides.forEach((_,i)=>{
+  const d=document.createElement("button");
+  d.className="dot"+(i===0?" active":"");
+  d.setAttribute("aria-label","Slide "+(i+1));
+  d.onclick=()=>goTo(i);
+  dotsWrap.appendChild(d);
+});
+function goTo(i){
+  slides[idx].classList.remove("active");dotsWrap.children[idx].classList.remove("active");
+  idx=(i+slides.length)%slides.length;
+  slides[idx].classList.add("active");dotsWrap.children[idx].classList.add("active");
+  startTimer();
+}
+function startTimer(){clearInterval(slTimer);slTimer=setInterval(()=>goTo(idx+1),4200);}
+document.querySelector(".next").onclick=()=>goTo(idx+1);
+document.querySelector(".prev").onclick=()=>goTo(idx-1);
+startTimer();
+let tx=0;
+const sl=document.getElementById("sliderEl");
+sl.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+sl.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)goTo(dx<0?idx+1:idx-1);},{passive:true});
+
+/* ── SEARCH ── */
+const searchInput=document.getElementById("searchInput"),
+      clearBtn=document.getElementById("clearSearch"),
+      serviceCards=document.querySelectorAll(".card"),
+      noResults=document.getElementById("noResults");
+searchInput.addEventListener("input",()=>{
+  const v=searchInput.value.toLowerCase();
+  clearBtn.style.display=v?"block":"none";
+  let visible=0;
+  serviceCards.forEach(c=>{
+    const m=((c.dataset.name||"")+c.innerText.toLowerCase()).includes(v);
+    c.style.display=m?"":"none";if(m)visible++;
+  });
+  noResults.style.display=visible===0?"block":"none";
+});
+clearBtn.addEventListener("click",()=>{
+  searchInput.value="";clearBtn.style.display="none";
+  serviceCards.forEach(c=>c.style.display="");
+  noResults.style.display="none";searchInput.focus();
+});
+
+/* ── BOTTOM NAV ── */
+document.querySelectorAll(".bottom-nav a").forEach(a=>{
+  a.addEventListener("click",function(){
+    document.querySelectorAll(".bottom-nav a").forEach(x=>x.classList.remove("active"));
+    this.classList.add("active");
+  });
+});
+
+/* ═══════════════════════════════════════
+   PWA: SERVICE WORKER REGISTRATION
+═══════════════════════════════════════ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      console.log('[PWA] Service Worker registered:', reg.scope);
+
+      // Notify user when new SW is available
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
+            showToast('🔄 App updated! Refresh for latest version.', 'warn');
+          }
+        });
+      });
+    } catch(err){
+      console.warn('[PWA] SW registration failed:', err);
+    }
+  });
+}
+
+/* ═══════════════════════════════════════
+   PWA: INSTALL PROMPT
+═══════════════════════════════════════ */
+let deferredPrompt = null;
+const installBanner = document.getElementById('installBanner');
+
+// Don't show if already installed
+const isInstalled = window.matchMedia('(display-mode: standalone)').matches
+                 || window.navigator.standalone === true;
+
+if(!isInstalled){
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show banner after short delay
+    setTimeout(() => installBanner.classList.add('show'), 3000);
+  });
+}
+
+document.getElementById('installAccept').addEventListener('click', async () => {
+  installBanner.classList.remove('show');
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if(outcome === 'accepted'){
+      showToast('🎉 Sarva-Nest installed! Find it on your home screen.', 'success');
+    }
+    deferredPrompt = null;
+  }
+});
+
+document.getElementById('installDismiss').addEventListener('click', () => {
+  installBanner.classList.remove('show');
+  // Don't show again this session
+  deferredPrompt = null;
+});
+
+// Hide banner if app was installed from prompt
+window.addEventListener('appinstalled', () => {
+  installBanner.classList.remove('show');
+  showToast('✅ App installed successfully!', 'success');
+});
+
+/* ═══════════════════════════════════════
+   PWA: ONLINE / OFFLINE INDICATOR
+═══════════════════════════════════════ */
+const offlineBanner = document.getElementById('offlineBanner');
+
+function updateOnlineStatus(){
+  if(!navigator.onLine){
+    offlineBanner.classList.add('show');
+    document.body.style.paddingTop = '40px';
+  } else {
+    offlineBanner.classList.remove('show');
+    document.body.style.paddingTop = '';
+    // Only show "back online" if we were previously offline
+    if(updateOnlineStatus._wasOffline){
+      showToast('✅ Back online!', 'success');
+    }
+    updateOnlineStatus._wasOffline = false;
+  }
+}
+
+window.addEventListener('online',  () => { updateOnlineStatus._wasOffline = true; updateOnlineStatus(); });
+window.addEventListener('offline', () => { updateOnlineStatus._wasOffline = true; updateOnlineStatus(); });
+updateOnlineStatus(); // Check initial state
+</script>
+</body>
+</html>
